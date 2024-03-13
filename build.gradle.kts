@@ -23,7 +23,9 @@ repositories {
 
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
-//    implementation(libs.annotations)
+
+    implementation("org.junit.jupiter:junit-jupiter:5.8.1")
+    implementation("org.mockito:mockito-core:5.11.0")
 
     testImplementation("org.mockito:mockito-core:5.10.0")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
@@ -66,16 +68,6 @@ koverReport {
         xml {
             onCheck = true
         }
-    }
-}
-
-tasks {
-    withType<Test> {
-        useJUnitPlatform()
-    }
-
-    register<Test>("harpoonerTests") {
-        group = "verification"
     }
 }
 
