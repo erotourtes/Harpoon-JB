@@ -3,21 +3,17 @@ package com.github.erotourtes.harpoon.utils.menu
 import com.github.erotourtes.harpoon.services.settings.SettingsState
 import com.intellij.openapi.editor.FoldRegion
 import com.intellij.openapi.editor.FoldingModel
-import com.intellij.openapi.fileEditor.FileEditorManager
-import com.intellij.openapi.project.Project
 import org.intellij.markdown.lexer.push
 
-class FoldsManager(private val menu: QuickMenu, private val project: Project) {
-    private val projectInfo = menu.projectInfo
-    private var settings = SettingsState.getInstance()
-
+class FoldsManager(
+    private val projectInfo: ProjectInfo,
+    private val foldingModel: FoldingModel?,
+    private var settings: FoldsSettings,
+) {
     fun updateFoldsAt(line: Int, str: String) {
-        if (!menu.isMenuFileOpenedWithCurEditor()) return
+        if (foldingModel == null) return
 
-        val editor = FileEditorManager.getInstance(project).selectedTextEditor ?: return
-        val foldingModel = editor.foldingModel
         val newFolds = getFoldsFrom(line, str)
-
         foldingModel.runBatchFoldingOperation {
             val curLineFolds = getCurrentLineFolds(foldingModel, line, line + str.length)
 
@@ -41,24 +37,11 @@ class FoldsManager(private val menu: QuickMenu, private val project: Project) {
         }
     }
 
-    fun updateSettings(newState: SettingsState) {
-        settings = newState
-    }
-
-    fun collapseAllFolds() {
-        val editor = FileEditorManager.getInstance(project).selectedTextEditor ?: return
-        val foldingModel = editor.foldingModel
-
-        foldingModel.runBatchFoldingOperation {
-            foldingModel.allFoldRegions.forEach { it.isExpanded = false }
-        }
-    }
-
     private fun getCurrentLineFolds(foldingModel: FoldingModel, start: Int, end: Int): MutableList<FoldRegion> {
         return foldingModel.allFoldRegions.filter {
             it.startOffset >= start && it.endOffset <= end
         }.toMutableList()
-    }
+   }
 
     private fun getFoldsFrom(line: Int, str: String): List<Triple<Int, Int, String>> {
         val folds = ArrayList<Triple<Int, Int, String>>()
@@ -80,5 +63,19 @@ class FoldsManager(private val menu: QuickMenu, private val project: Project) {
         }
 
         return folds
+    }
+
+    data class FoldsSettings(
+        var showProjectPath: Boolean,
+        var numberOfSlashes: Int,
+    ) {
+        companion object {
+            fun fromSettings(settings: SettingsState): FoldsSettings {
+                return FoldsSettings(
+                    showProjectPath = settings.showProjectPath,
+                    numberOfSlashes = settings.numberOfSlashes,
+                )
+            }
+        }
     }
 }

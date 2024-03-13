@@ -24,11 +24,10 @@ import java.io.File
 
 // TODO: think about settings encapsulation
 class QuickMenu(private val project: Project, private val harpoonService: HarpoonService) : Disposable {
-    val projectInfo: ProjectInfo
+    private val projectInfo: ProjectInfo
     private lateinit var menuFile: File
     lateinit var virtualFile: VirtualFile
         private set
-    private val foldsManager: FoldsManager
     private var processor: PathsProcessor
     private val listenerManager = ListenerManager()
 
@@ -45,7 +44,6 @@ class QuickMenu(private val project: Project, private val harpoonService: Harpoo
         listenToMenuTypingChange(settings)
         listenToEditorFocus()
 
-        foldsManager = FoldsManager(this, project)
         processor = PathsProcessor(projectInfo)
     }
 
@@ -73,12 +71,25 @@ class QuickMenu(private val project: Project, private val harpoonService: Harpoo
         return this
     }
 
+    private fun getFoldingManager(): FoldsManager {
+        val editor = FileEditorManager.getInstance(project).selectedTextEditor
+        val foldingModel =
+            if (isMenuFileOpenedWith(editor)) editor?.foldingModel else null
+
+        return FoldsManager(
+            projectInfo,
+            foldingModel,
+            FoldsManager.FoldsSettings.fromSettings(SettingsState.getInstance())
+        )
+    }
+
     private fun updateFile(content: List<String>): QuickMenu {
+        val foldsManager = getFoldingManager()
         val processedContent = processor.process(content)
 
         val app = ApplicationManager.getApplication()
         app.invokeLater {
-            if (project.isDisposed) return@invokeLater
+            if (project.isDisposed || isMenuFileOpenedWithCurEditor()) return@invokeLater
 
             WriteCommandAction.runWriteCommandAction(project) {
                 val docManager = FileDocumentManager.getInstance()
@@ -132,8 +143,6 @@ class QuickMenu(private val project: Project, private val harpoonService: Harpoo
     }
 
     private fun updateSettings(settings: SettingsState) {
-        foldsManager.updateSettings(settings)
-
         processor.updateSettings(settings)
         updateFile(harpoonService.getPaths())
     }
@@ -146,12 +155,13 @@ class QuickMenu(private val project: Project, private val harpoonService: Harpoo
         caretModel.moveToOffset(currentLineEndOffset)
     }
 
-    fun isMenuFileOpenedWithCurEditor(): Boolean {
+    private fun isMenuFileOpenedWithCurEditor(): Boolean {
         val editor = FileEditorManager.getInstance(project).selectedTextEditor ?: return false
         return isMenuFileOpenedWith(editor)
     }
 
-    private fun isMenuFileOpenedWith(editor: Editor): Boolean {
+    private fun isMenuFileOpenedWith(editor: Editor?): Boolean {
+        if (editor == null) return false
         val editorFilePath = FileDocumentManager.getInstance().getFile(editor.document)?.path ?: return false
         return editorFilePath == virtualFile.path
     }
