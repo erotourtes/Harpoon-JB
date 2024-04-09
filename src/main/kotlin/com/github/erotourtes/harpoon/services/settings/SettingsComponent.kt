@@ -64,20 +64,17 @@ class SettingsComponent {
         private var numberOfSlashes: Int by SliderDelegate(numberOfSlashesUI)
         private var showProjectPath: Boolean by CheckBoxDelegate(showProjectPathUI)
         private var showNotifications: Boolean by CheckBoxDelegate(showNotificationsUI)
-        private var isSavingOnType: Boolean by CheckBoxDelegate(saveOnType)
 
         private var uiSettings: HarpoonSettings
             get() = HarpoonSettings(
                 numberOfSlashes = numberOfSlashes,
                 showProjectPath = showProjectPath,
                 showNotifications = showNotifications,
-                isSavingOnTyping = isSavingOnType
             )
             set(value) {
                 numberOfSlashes = value.numberOfSlashes
                 showProjectPath = value.showProjectPath
                 showNotifications = value.showNotifications
-                isSavingOnType = value.isSavingOnTyping
             }
 
         fun reset(settings: SettingsState) {
