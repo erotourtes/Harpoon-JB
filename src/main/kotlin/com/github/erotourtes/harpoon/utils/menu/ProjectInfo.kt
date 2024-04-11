@@ -2,7 +2,7 @@ package com.github.erotourtes.harpoon.utils.menu
 
 import com.github.erotourtes.harpoon.utils.IDEA_PROJECT_FOLDER
 
-data class ProjectInfo(val name: String, val pathWithSlashAtEnd: String) {
+data class ProjectInfo(val nameWithSlashAtEnd: String, val pathWithSlashAtEnd: String) {
     companion object {
         fun from(path: String?): ProjectInfo {
             val endIndex = path?.lastIndexOf(IDEA_PROJECT_FOLDER)

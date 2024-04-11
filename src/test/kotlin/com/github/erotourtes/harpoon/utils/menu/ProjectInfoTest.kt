@@ -9,7 +9,7 @@ class ProjectInfoTest {
         val path = "/home/user/Projects/MyProject/.idea/Harpooner Menu"
         val projectInfo = ProjectInfo.from(path)
 
-        assertEquals("MyProject/", projectInfo.name)
+        assertEquals("MyProject/", projectInfo.nameWithSlashAtEnd)
         assertEquals("/home/user/Projects/MyProject/", projectInfo.pathWithSlashAtEnd)
     }
 
@@ -18,7 +18,7 @@ class ProjectInfoTest {
         val path = ""
         val projectInfo = ProjectInfo.from(path)
 
-        assertEquals("", projectInfo.name)
+        assertEquals("", projectInfo.nameWithSlashAtEnd)
         assertEquals("", projectInfo.pathWithSlashAtEnd)
     }
 }

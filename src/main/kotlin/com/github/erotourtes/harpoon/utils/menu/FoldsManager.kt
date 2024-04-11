@@ -48,7 +48,7 @@ class FoldsManager(
         var lastFoldIndex = 0
         if (settings.showProjectPath && str.startsWith(projectInfo.pathWithSlashAtEnd)) {
             val endIndex = projectInfo.pathWithSlashAtEnd.length
-            folds.push(Triple(line, line + endIndex, projectInfo.name))
+            folds.push(Triple(line, line + endIndex, projectInfo.nameWithSlashAtEnd))
             lastFoldIndex += endIndex
         }
 
