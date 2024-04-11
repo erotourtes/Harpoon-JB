@@ -59,7 +59,9 @@ class HarpoonService(project: Project) : Disposable {
         }
     }
 
-    private fun setPaths(paths: List<String>): Unit = state.set(paths)
+    internal fun setPaths(paths: List<String>): Unit = state.set(paths)
+
+    val menuVF: VirtualFile get() = menu.virtualFile
 
     private fun getFile(index: Int): VirtualFile? = state.getFile(index)
 

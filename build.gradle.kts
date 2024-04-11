@@ -23,13 +23,10 @@ repositories {
 
 // Dependencies are managed with Gradle version catalog - read more: https://docs.gradle.org/current/userguide/platforms.html#sub:version-catalog
 dependencies {
-
     implementation("org.junit.jupiter:junit-jupiter:5.8.1")
     implementation("org.mockito:mockito-core:5.11.0")
 
     testImplementation("org.mockito:mockito-core:5.10.0")
-
-    // https://mvnrepository.com/artifact/org.mockito.kotlin/mockito-kotlin
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
 
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
@@ -83,7 +80,6 @@ tasks {
         useJUnitPlatform()
     }
 }
-
 
 tasks {
     wrapper {
@@ -145,3 +141,45 @@ tasks {
             properties("pluginVersion").map { listOf(it.split('-').getOrElse(1) { "default" }.split('.').first()) }
     }
 }
+
+sourceSets {
+    create("intTest") {
+        compileClasspath += sourceSets.main.get().output
+        runtimeClasspath += sourceSets.main.get().output
+    }
+}
+
+idea {
+    module {
+        testSources.from(sourceSets["intTest"].kotlin.srcDirs)
+    }
+}
+
+val intTestImplementation by configurations.getting {
+//    extendsFrom(configurations.implementation.get())
+    extendsFrom(configurations.testImplementation.get())
+}
+val intTestRuntimeOnly by configurations.getting
+
+configurations["intTestRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get())
+
+val integrationTest = task<Test>("integrationTest") {
+    description = "Runs integration tests."
+    group = "verification"
+
+    testClassesDirs = sourceSets["intTest"].output.classesDirs
+    classpath = sourceSets["intTest"].runtimeClasspath
+//    shouldRunAfter("test")
+//    useJUnitPlatform()
+
+    testLogging {
+        events("passed")
+    }
+}
+
+tasks.check { dependsOn(integrationTest) }
+
+//dependencies {
+//    intTestImplementation("com.jetbrains:ideaIC:2022.3.3")
+//}
+
