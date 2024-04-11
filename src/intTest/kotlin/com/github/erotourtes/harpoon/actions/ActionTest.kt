@@ -1,6 +1,6 @@
 package com.github.erotourtes.harpoon.actions
 
-import com.github.erotourtes.harpoon.HarpoonTestCase
+import com.github.erotourtes.harpoon.services.HarpoonTestCase
 import org.junit.jupiter.api.Assertions
 
 class ActionTest : HarpoonTestCase() {

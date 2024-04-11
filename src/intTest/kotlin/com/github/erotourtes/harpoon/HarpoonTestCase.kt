@@ -1,6 +1,5 @@
-package com.github.erotourtes.harpoon
+package com.github.erotourtes.harpoon.services
 
-import com.github.erotourtes.harpoon.services.HarpoonService
 import com.github.erotourtes.harpoon.settings.SettingsState
 import com.intellij.openapi.application.Application
 import com.intellij.openapi.application.ApplicationManager
