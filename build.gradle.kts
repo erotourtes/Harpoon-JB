@@ -28,9 +28,16 @@ dependencies {
     implementation("org.mockito:mockito-core:5.11.0")
 
     testImplementation("org.mockito:mockito-core:5.10.0")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.1")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.1")
+
+    // https://mvnrepository.com/artifact/org.mockito.kotlin/mockito-kotlin
+    testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.10.2")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.10.2")
+    implementation("org.junit.jupiter:junit-jupiter-api:5.10.2")
+    implementation("org.junit.jupiter:junit-jupiter-engine:5.10.2")
+    implementation("org.junit.jupiter:junit-jupiter-params:5.10.2")
 }
 
 // Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.
@@ -70,6 +77,13 @@ koverReport {
         }
     }
 }
+
+tasks {
+    test {
+        useJUnitPlatform()
+    }
+}
+
 
 tasks {
     wrapper {
