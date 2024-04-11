@@ -23,13 +23,17 @@ import java.io.File
 
 
 // TODO: think about settings encapsulation
-class QuickMenu(private val project: Project, private val harpoonService: HarpoonService) : Disposable {
+class QuickMenu(
+    private val project: Project,
+    private val harpoonService: HarpoonService
+) : Disposable {
     private val projectInfo: ProjectInfo
-    private lateinit var menuFile: File
     lateinit var virtualFile: VirtualFile
         private set
     private var processor: PathsProcessor
     private val listenerManager = ListenerManager()
+    private val fileEditorManager = FileEditorManager.getInstance(project)
+
 
     init {
         Disposer.register(harpoonService, this)
@@ -59,20 +63,17 @@ class QuickMenu(private val project: Project, private val harpoonService: Harpoo
     }
 
     fun open(): QuickMenu {
-        val fileManager = FileEditorManager.getInstance(project)
-
         if (!virtualFile.isValid) initMenuFile()
 
-        fileManager.openFile(virtualFile, true)
+        fileEditorManager.openFile(virtualFile, true)
         syncWithService()
-//        foldsManager.collapseAllFolds()
         setCursorToEnd()
 
         return this
     }
 
     private fun getFoldingManager(): FoldsManager {
-        val editor = FileEditorManager.getInstance(project).selectedTextEditor
+        val editor = fileEditorManager.selectedTextEditor
         val foldingModel =
             if (isMenuFileOpenedWith(editor)) editor?.foldingModel else null
 
@@ -137,7 +138,7 @@ class QuickMenu(private val project: Project, private val harpoonService: Harpoo
     }
 
     private fun setCursorToEnd() {
-        val editor = FileEditorManager.getInstance(project).selectedTextEditor ?: return
+        val editor = fileEditorManager.selectedTextEditor ?: return
         val caretModel = editor.caretModel
         val currentLineNumber = caretModel.logicalPosition.line
         val currentLineEndOffset = editor.document.getLineEndOffset(currentLineNumber)
@@ -145,7 +146,7 @@ class QuickMenu(private val project: Project, private val harpoonService: Harpoo
     }
 
     private fun isMenuFileOpenedWithCurEditor(): Boolean {
-        val editor = FileEditorManager.getInstance(project).selectedTextEditor ?: return false
+        val editor = fileEditorManager.selectedTextEditor ?: return false
         return isMenuFileOpenedWith(editor)
     }
 
@@ -156,8 +157,10 @@ class QuickMenu(private val project: Project, private val harpoonService: Harpoo
     }
 
     private fun initMenuFile() {
-        menuFile = getMenuFile()
-        virtualFile = LocalFileSystem.getInstance().refreshAndFindFileByIoFile(menuFile)
+        val menuFile = getMenuFile()
+        virtualFile = LocalFileSystem
+            .getInstance()
+            .refreshAndFindFileByIoFile(menuFile)
             ?: throw Exception("File is not found, this should not happen")
     }
 
@@ -179,7 +182,6 @@ class QuickMenu(private val project: Project, private val harpoonService: Harpoo
 
     private inner class FocusListener : FocusChangeListener {
         private var isHarpoonerPrevFocused = false
-        private val fileEditorManager = FileEditorManager.getInstance(project)
 
         private fun closeMenuInEditor() {
             fileEditorManager.closeFile(virtualFile)
