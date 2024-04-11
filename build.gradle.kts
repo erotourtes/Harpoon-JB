@@ -156,6 +156,7 @@ idea {
 }
 
 val intTestImplementation by configurations.getting {
+//    extendsFrom(configurations.implementation.get())
     extendsFrom(configurations.testImplementation.get())
 }
 val intTestRuntimeOnly by configurations.getting
@@ -168,6 +169,8 @@ val integrationTest = task<Test>("integrationTest") {
 
     testClassesDirs = sourceSets["intTest"].output.classesDirs
     classpath = sourceSets["intTest"].runtimeClasspath
+//    shouldRunAfter("test")
+//    useJUnitPlatform()
 
     testLogging {
         events("passed")
@@ -175,3 +178,8 @@ val integrationTest = task<Test>("integrationTest") {
 }
 
 tasks.check { dependsOn(integrationTest) }
+
+//dependencies {
+//    intTestImplementation("com.jetbrains:ideaIC:2022.3.3")
+//}
+
