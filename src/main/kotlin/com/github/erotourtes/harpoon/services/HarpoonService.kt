@@ -66,11 +66,22 @@ class HarpoonService(project: Project) : Disposable {
     private fun onRenameFile(oldPath: String, newPath: String?) {
         val isDeleteEvent = newPath == null
         if (isDeleteEvent) state.remove(oldPath)
-        else if (state.update(oldPath, newPath)) // TODO: somehow rename listener can go crazy and spam file change events
+        else if (state.updatePathForFile(
+                oldPath, newPath
+            )
+        ) // TODO: somehow rename listener can go crazy and spam file change events
             menu.syncWithService()
     }
 
-    class State {
+    class FilesFinder(
+        private val localFileSystem: LocalFileSystem = LocalFileSystem.getInstance()
+    ) {
+        fun findFileBy(path: String): VirtualFile? = localFileSystem.findFileByPath(path)
+    }
+
+    class State(
+        private val filesFinder: FilesFinder = FilesFinder()
+    ) {
         private var data: ArrayList<String> = ArrayList()
         private val virtualFiles = mutableMapOf<String, VirtualFile?>()
 
@@ -78,7 +89,7 @@ class HarpoonService(project: Project) : Disposable {
 
         fun getFile(index: Int): VirtualFile? {
             val path = data.getOrNull(index) ?: return null
-            return virtualFiles.getOrPut(path) { LocalFileSystem.getInstance().findFileByPath(path) }
+            return virtualFiles.getOrPut(path) { filesFinder.findFileBy(path) }
         }
 
         fun set(newPaths: List<String>) {
@@ -89,7 +100,7 @@ class HarpoonService(project: Project) : Disposable {
         fun add(path: String) {
             if (data.contains(path)) return
             data.add(path)
-            virtualFiles[path] = LocalFileSystem.getInstance().findFileByPath(path)
+            virtualFiles[path] = filesFinder.findFileBy(path)
         }
 
         fun remove(path: String) {
@@ -99,7 +110,7 @@ class HarpoonService(project: Project) : Disposable {
             virtualFiles.remove(path)
         }
 
-        fun update(oldPath: String, newPath: String?): Boolean {
+        fun updatePathForFile(oldPath: String, newPath: String?): Boolean {
             val index = data.indexOf(oldPath)
             if (index == -1) return false
 
