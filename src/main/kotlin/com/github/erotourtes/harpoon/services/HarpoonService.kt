@@ -1,13 +1,13 @@
 package com.github.erotourtes.harpoon.services
 
 import com.github.erotourtes.harpoon.listeners.FilesRenameListener
+import com.github.erotourtes.harpoon.utils.FilesFinder
 import com.github.erotourtes.harpoon.utils.menu.QuickMenu
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.components.*
 import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.LocalFileSystem
 import com.intellij.openapi.vfs.VirtualFile
 
 // TODO: optimise live save of the menu
@@ -71,12 +71,6 @@ class HarpoonService(project: Project) : Disposable {
             )
         ) // TODO: somehow rename listener can go crazy and spam file change events
             menu.syncWithService()
-    }
-
-    class FilesFinder(
-        private val localFileSystem: LocalFileSystem = LocalFileSystem.getInstance()
-    ) {
-        fun findFileBy(path: String): VirtualFile? = localFileSystem.findFileByPath(path)
     }
 
     class State(

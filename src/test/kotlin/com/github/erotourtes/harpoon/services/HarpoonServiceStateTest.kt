@@ -1,5 +1,6 @@
 package com.github.erotourtes.harpoon.services
 
+import com.github.erotourtes.harpoon.utils.FilesFinder
 import com.intellij.openapi.vfs.VirtualFile
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -7,7 +8,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
 
 class HarpoonServiceStateTest {
-    private lateinit var filesFinder: HarpoonService.FilesFinder
+    private lateinit var filesFinder: FilesFinder
     private val path1 = "/project/files/1.txt"
     private val path2 = "/project/files/2.txt"
     private lateinit var state: HarpoonService.State
@@ -16,7 +17,7 @@ class HarpoonServiceStateTest {
 
     @BeforeEach
     fun setUp() {
-        filesFinder = mock(HarpoonService.FilesFinder::class.java)
+        filesFinder = mock(FilesFinder::class.java)
         state = HarpoonService.State(filesFinder)
 
         vf1 = mock(VirtualFile::class.java)
