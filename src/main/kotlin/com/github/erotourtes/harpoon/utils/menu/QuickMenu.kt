@@ -2,7 +2,7 @@ package com.github.erotourtes.harpoon.utils.menu
 
 import com.github.erotourtes.harpoon.listeners.MenuChangeListener
 import com.github.erotourtes.harpoon.services.HarpoonService
-import com.github.erotourtes.harpoon.services.settings.SettingsState
+import com.github.erotourtes.harpoon.settings.SettingsState
 import com.github.erotourtes.harpoon.utils.IDEA_PROJECT_FOLDER
 import com.github.erotourtes.harpoon.utils.ListenerManager
 import com.github.erotourtes.harpoon.utils.MENU_NAME
