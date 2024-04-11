@@ -48,7 +48,7 @@ class QuickMenu(
         listenToMenuTypingChange()
         listenToEditorFocus()
 
-        processor = PathsProcessor(projectInfo)
+        processor = PathsProcessor(projectInfo, PathsProcessor.Settings.from(settings))
     }
 
     fun readLines(): List<String> {
@@ -132,7 +132,7 @@ class QuickMenu(
     }
 
     private fun updateSettings(settings: SettingsState) {
-        processor.updateSettings(settings)
+        processor.updateSettings(PathsProcessor.Settings.from(settings))
         updateFile(harpoonService.getPaths())
     }
 
