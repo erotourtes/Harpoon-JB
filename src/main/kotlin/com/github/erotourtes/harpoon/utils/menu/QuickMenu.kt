@@ -25,15 +25,15 @@ import java.io.File
 // TODO: think about settings encapsulation
 class QuickMenu(
     private val project: Project,
-    private val harpoonService: HarpoonService
+    private val harpoonService: HarpoonService,
+    private val documentManager: FileDocumentManager = FileDocumentManager.getInstance(),
+    private val fileEditorManager: FileEditorManager = FileEditorManager.getInstance(project)
 ) : Disposable {
     private val projectInfo: ProjectInfo
     lateinit var virtualFile: VirtualFile
         private set
     private var processor: PathsProcessor
     private val listenerManager = ListenerManager()
-    private val fileEditorManager = FileEditorManager.getInstance(project)
-
 
     init {
         Disposer.register(harpoonService, this)
@@ -52,8 +52,7 @@ class QuickMenu(
     }
 
     fun readLines(): List<String> {
-        val docManager = FileDocumentManager.getInstance()
-        val document = docManager.getDocument(virtualFile) ?: throw Error("Can't read file")
+        val document = documentManager.getDocument(virtualFile) ?: throw Error("Can't read file")
 
         return document.text.split("\n").map { processor.unprocess(it) }
     }
@@ -93,8 +92,8 @@ class QuickMenu(
             if (project.isDisposed || !isMenuFileOpenedWithCurEditor()) return@invokeLater
 
             WriteCommandAction.runWriteCommandAction(project) {
-                val docManager = FileDocumentManager.getInstance()
-                val document = docManager.getDocument(virtualFile) ?: return@runWriteCommandAction
+                val document = documentManager
+                    .getDocument(virtualFile) ?: return@runWriteCommandAction
 
                 processedContent.joinToString("\n").let { document.setText(it) }
                 processedContent.forEachIndexed { index, it ->
@@ -119,7 +118,7 @@ class QuickMenu(
     }
 
     private fun listenToMenuTypingChange() {
-        val menuDocument = FileDocumentManager.getInstance().getDocument(virtualFile)
+        val menuDocument = documentManager.getDocument(virtualFile)
             ?: throw Error("Can't get document of the ${virtualFile.path} file")
         val documentListener = MenuChangeListener(harpoonService, menuDocument)
 
@@ -152,7 +151,7 @@ class QuickMenu(
 
     private fun isMenuFileOpenedWith(editor: Editor?): Boolean {
         if (editor == null) return false
-        val editorFilePath = FileDocumentManager.getInstance().getFile(editor.document)?.path ?: return false
+        val editorFilePath = documentManager.getFile(editor.document)?.path ?: return false
         return editorFilePath == virtualFile.path
     }
 
